@@ -10,13 +10,11 @@ def seed_fertilizer(data):
         for map_block in blocks[1:]:
             pts = map_block.split('\n')[1:]
             pts = [[*map(int, row)] for row in map(str.split, pts)]
-            pts = ([b, b + c, a - b] for a, b, c in pts)
-            ivals = {10**10: 0}
-            for l, r, d in sorted(pts, reverse=True):
-                ivals[r], ivals[l] = d, 0
+            pts = sorted([b, b + c, a - b] for a, b, c in pts)
+            ivals = [[pts[0][0], 0]] + [p[1:] for p in pts] + [[10**10, 0]]
             cur, pre = [], cur
             for l, r in pre:
-                for k, v in reversed(ivals.items()):
+                for k, v in ivals:
                     if k > l:
                         cur += [l + v, min(r, k) + v],
                         if k > r: break
