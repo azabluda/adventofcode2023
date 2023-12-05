@@ -3,17 +3,25 @@
 
 def seed_fertilizer(data):
     blocks = data.split('\n\n')
-    res = 10 ** 10
-    for seed in map(int, blocks[0].split()[1:]):
+    seeds = [int(a) for a in blocks[0].split()[1:]]
+    part1 = [[a, a] for a in seeds]
+    part2 = [[a, a + b] for a, b in zip(seeds[::2], seeds[1::2])]
+    for cur in part1, part2:
         for map_block in blocks[1:]:
-            for map_line in map_block.split('\n')[1:]:
-                dst, src, sz = map(int, map_line.split())
-                off = seed - src
-                if 0 <= off < sz:
-                    seed = dst + off
-                    break
-        res = min(res, seed)
-    yield res
+            pts = map_block.split('\n')[1:]
+            pts = [[*map(int, row)] for row in map(str.split, pts)]
+            pts = ([b, b + c, a - b] for a, b, c in pts)
+            ivals = {10**10: 0}
+            for l, r, d in sorted(pts, reverse=True):
+                ivals[r], ivals[l] = d, 0
+            cur, pre = [], cur
+            for l, r in pre:
+                for k, v in reversed(ivals.items()):
+                    if k > l:
+                        cur += [l + v, min(r, k) + v],
+                        if k > r: break
+                        l = k
+        yield min(cur)[0]
 
 
 def inputs():
