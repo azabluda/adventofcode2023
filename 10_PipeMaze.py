@@ -6,31 +6,18 @@ def pipe_maze(data):
             for r, row in enumerate(data.split('\n'))
             for c, val in enumerate(row)}
     pipes = (-1, '|LJ'), (1, '|7F'), (-1j, '-J7'), (1j, '-LF')
-    pre = next(k for k, v in maze.items() if v == 'S')
+    start = pre = next(k for k, v in maze.items() if v == 'S')
     cur = pre - next(d for d, p in pipes if maze[pre - d] in p)
-    path = {pre, cur}
-    LR = set(), set()
-    while maze[cur] != 'S':
-        for i, X in enumerate(LR):
-            d = [1j, -1j][i] * (cur - pre)
-            X |= {cur + d, pre + d}
+    length = area = 0
+    while True:
+        length += 1
+        area += pre.imag * cur.real - cur.imag * pre.real
+        if cur == start: break
         mov = next(d for d, p in pipes
                    if maze[cur] in p and cur + d != pre)
         pre, cur = cur, cur + mov
-        path.add(cur)
-    for X in LR:
-        X -= path
-        bfs = [*X]
-        for u in bfs:
-            for i in range(4):
-                v = u + 1j ** i
-                if v in X: continue
-                if v in path: continue
-                if v not in maze: continue
-                X.add(v)
-                bfs.append(v)
-    yield len(path) // 2
-    yield min(map(len, LR))
+    yield length // 2 # part 1
+    yield int(abs(area)) // 2 - length // 2 + 1 # part 2
 
 
 def inputs():
