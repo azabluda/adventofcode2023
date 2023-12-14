@@ -1,9 +1,8 @@
 # https://adventofcode.com/2023/day/13
 # Day 13: Point of Incidence
 
-from itertools import accumulate
-
 def point_of_incidence(data):
+    data = data.replace('#', '1').replace('.', '0')
     blocks = data.split('\n\n')
     for part in 0, 1:
         res = 0
@@ -11,10 +10,10 @@ def point_of_incidence(data):
             block = block.split('\n')
             for i in 100, 1:
                 x = 0
-                B = [sum((b == '#') * (2 ** j) for j, b in enumerate(row)) for row in block]
-                for j, lo in enumerate(accumulate(B, lambda a, b: [b] + a, initial=[])):
-                    hi = B[j:2*j]
-                    if lo and hi and sum((a ^ b).bit_count() for a, b in zip(lo, hi)) == part:
+                X = [int(''.join(row), 2) for row in block]
+                for j in range(1, len(X)):
+                    A, B = X[:j][::-1], X[j:]
+                    if sum((a ^ b).bit_count() for a, b in zip(A, B)) == part:
                         x = j
                 res += x * i
                 block = [*zip(*block)] # transpose block
