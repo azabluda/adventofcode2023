@@ -1,21 +1,32 @@
 # https://adventofcode.com/2023/day/21
 # Day 21: Step Counter
 
-def step_counter(data):
-    for steps in 6, 64:
-        map = {r + 1j * c: val
-               for r, row in enumerate(data.split('\n'))
-               for c, val in enumerate(row)}
-        rox = {pos for pos in map if map[pos] == '#'}
-        cur = {pos for pos in map if map[pos] == 'S'}
-        for _ in range(steps):
-            cur = {pos + 1j ** i for pos in cur for i in range(4)} & {*map} - rox
-        yield steps, len(cur)
+# I thoroughly failed 2nd part, all credits go to https://github.com/villuna/aoc23/blob/main/rust/src/day21.rs
+def step_counter(steps, data):
+    map = {r + 1j * c: val
+           for r, row in enumerate(data.split('\n'))
+           for c, val in enumerate(row)}
+    rox = {pos for pos in map if map[pos] == '#'}
+    fst = [pos for pos in map if map[pos] == 'S'][0]
+    bfs, vis = [(fst, 0)], {fst}
+    odd, evn = [], []
+    for pos, dst in bfs:
+        [odd, evn][dst % 2] += dst,
+        for i in range(4):
+            npos = pos + 1j ** i
+            if npos not in map: continue
+            if npos in vis or npos in rox: continue
+            vis.add(npos)
+            bfs += (npos, dst + 1),
+    n, m = 202300, 202301
+    yield sum(v <= steps for v in odd)
+    yield n * (n * len(odd) + sum(v > 65 for v in odd)) + \
+          m * (m * len(evn) - sum(v > 65 for v in evn))
 
 
 def inputs():
 
-    yield """
+    yield 6, """
 ...........
 .....###.#.
 .###.##..#.
@@ -29,7 +40,7 @@ def inputs():
 ...........
 """
 
-    yield """
+    yield 64, """
 ...................................................................................................................................
 ....#...#..............................#............#......................###..........#.......#...............#....#.......#.....
 ..#...#........####..#....#...#.#..#......#......#.##.......................#..#.......#.........#...#.........#...........#..##.#.
@@ -163,5 +174,5 @@ def inputs():
 ...................................................................................................................................
 """
 
-for data in inputs():
-    print(*step_counter(data.strip()))
+for steps, data in inputs():
+    print(*step_counter(steps, data.strip()))
