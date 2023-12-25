@@ -2,10 +2,14 @@
 # Day 24: Never Tell Me The Odds
 
 from itertools import combinations
+from operator import sub
+from numpy import linalg
 
 def never_tell_odds(lo, hi, data):
     A = [[[*map(int, s.split(', '))] for s in line.split('@')]
          for line in data.split('\n')]
+
+    # part 1
     res = 0
     for s, S in combinations(A, 2):
         (x, y, z), (u, v, w) = s
@@ -17,6 +21,16 @@ def never_tell_odds(lo, hi, data):
                lo <= x + u * t <= hi and lo <= y + v * t <= hi and \
                lo <= X + U * T <= hi and lo <= Y + V * T <= hi
     yield res
+
+    # part 2: i fail miserably... 😭
+    # Credits to https://www.reddit.com/r/adventofcode/comments/18q40he
+    def solve(i, j):
+        m = [[-v[j], v[i], p[j], -p[i], p[j] * v[i] - p[i] * v[j]] for p, v in A[:5]]
+        m = [[*map(sub, r, m[-1])] for r in m[:4]]
+        return linalg.solve([r[:-1] for r in m], [r[-1] for r in m])
+    x, y, *_ = solve(0, 1)
+    z, *_ = solve(2, 1)
+    yield round(x + y + z)
 
 
 def inputs():
