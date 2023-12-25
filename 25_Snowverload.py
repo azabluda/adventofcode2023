@@ -1,48 +1,34 @@
 # https://adventofcode.com/2023/day/25
 # Day 25: Snowverload 
 
-import networkx as nx
-import matplotlib.pyplot as plt
+from math import prod
+from igraph import Graph
 
 def snowverload(data):
-    G = nx.Graph()
+    edges = []
     for line in data.replace(':', '').split('\n'):
         U, *Vs = line.split()
-        G.add_edges_from((U, V) for V in Vs)
-
-    # look at visualization
-    #nx.draw(G, with_labels=True)
-    #plt.show()
-
-    # lol cheatz 🙃
-    G.remove_edge('htj', 'pcc')
-    G.remove_edge('bbg', 'htb')
-    G.remove_edge('dlk', 'pjj')
-
-    #nx.draw(G, with_labels=True)
-    #plt.show()
-
-    A, B = nx.connected_components(G)
-    yield len(A) * len(B)
+        edges += ((U, V) for V in Vs)
+    yield prod(Graph.TupleList(edges).mincut().sizes())
 
 
 def inputs():
 
-#     yield """
-# jqt: rhn xhk nvd
-# rsh: frs pzl lsr
-# xhk: hfx
-# cmg: qnr nvd lhk bvb
-# rhn: xhk bvb hfx
-# bvb: xhk hfx
-# pzl: lsr hfx nvd
-# qnr: nvd
-# ntq: jqt hfx bvb xhk
-# nvd: lhk
-# lsr: lhk
-# rzs: qnr cmg lsr rsh
-# frs: qnr lhk lsr
-# """
+    yield """
+jqt: rhn xhk nvd
+rsh: frs pzl lsr
+xhk: hfx
+cmg: qnr nvd lhk bvb
+rhn: xhk bvb hfx
+bvb: xhk hfx
+pzl: lsr hfx nvd
+qnr: nvd
+ntq: jqt hfx bvb xhk
+nvd: lhk
+lsr: lhk
+rzs: qnr cmg lsr rsh
+frs: qnr lhk lsr
+"""
 
     yield """
 msq: pdm
