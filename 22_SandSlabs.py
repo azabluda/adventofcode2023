@@ -27,12 +27,11 @@ def sand_slabs(data):
     res1 = len(safe.difference(*(s for s in sup_by if len(s) == 1)))
     res2 = 0
     for u in range(len(settled)):
-        rip, kill = set(), {u}
-        bfs = supports[u]
-        while kill:
-            rip |= kill
-            bfs = set.union(*(supports[v] for v in kill))
-            kill = {v for v in bfs if not sup_by[v] - rip}
+        rip, bfs = set(), {u}
+        while bfs:
+            rip |= bfs
+            bfs = set.union(*(supports[v] for v in bfs))
+            bfs = {v for v in bfs if not sup_by[v] - rip}
         res2 += len(rip) - 1
     return res1, res2
 
