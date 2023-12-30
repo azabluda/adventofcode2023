@@ -6,14 +6,13 @@ from operator import sub
 from numpy import linalg
 
 def never_tell_odds(lo, hi, data):
-    A = [[[*map(int, s.split(', '))] for s in line.split('@')]
-         for line in data.split('\n')]
+    A = [[*map(int, s.split(','))] for s in data.replace('@', ',').split('\n')]
 
     # part 1
     res = 0
     for s, S in combinations(A, 2):
-        (x, y, z), (u, v, w) = s
-        (X, Y, Z), (U, V, W) = S
+        x, y, z, u, v, w = s
+        X, Y, Z, U, V, W = S
         if u * V == U * v: continue
         t = ((X - x) * V + (y - Y) * U) / (u * V - U * v)
         T = ((x - X) * v + (Y - y) * u) / (U * v - u * V)
@@ -24,13 +23,11 @@ def never_tell_odds(lo, hi, data):
 
     # part 2: i fail miserably... 😭
     # Credits to https://www.reddit.com/r/adventofcode/comments/18q40he
-    def solve(i, j):
-        m = [[-v[j], v[i], p[j], -p[i], p[j] * v[i] - p[i] * v[j]] for p, v in A[:5]]
+    def solve(i, I):
+        m = [[-a[3], a[I], a[0], -a[i], a[0] * a[I] - a[i] * a[3]] for a in A[:5]]
         m = [[*map(sub, r, m[-1])] for r in m[:4]]
         return linalg.solve([r[:-1] for r in m], [r[-1] for r in m])
-    x, y, *_ = solve(0, 1)
-    z, *_ = solve(2, 1)
-    yield round(x + y + z)
+    yield round(sum(solve(1, 4)[:2]) + solve(2, 5)[0])
 
 
 def inputs():
